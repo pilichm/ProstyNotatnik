@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.5.10"
 }
 
 android {
@@ -9,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "pl.pilichm.prostynotatnik"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -43,4 +44,5 @@ dependencies {
     apply plugin: "kotlin-android-extensions"
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 }
