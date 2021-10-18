@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ProstyNotatnik</string>
+
+    <string name="menu_add_note">Add note</string>
+    <string name="mock_note_text">Mock note that wont be seen...</string>
+    <string name="add_note_text">Add note...</string>
 </resources>

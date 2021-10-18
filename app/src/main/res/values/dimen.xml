@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="note_item_margin">4dp</dimen>
+    <dimen name="note_item_text_size">24sp</dimen>
+    <dimen name="cardElevation">10dp</dimen>
+    <dimen name="cardCornerRadius">20dp</dimen>
+    <dimen name="edit_text_amount_text_size">18sp</dimen>
+    <dimen name="add_note_default_margin">8sp</dimen>
+    <dimen name="fab_default_margin">16dp</dimen>
+</resources>

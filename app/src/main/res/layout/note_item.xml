@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="@dimen/cardElevation"
+    android:background="@color/note_item_background"
+    app:cardCornerRadius="@dimen/cardCornerRadius"
+    app:cardPreventCornerOverlap="true"
+    android:layout_margin="@dimen/note_item_margin">
+
+    <TextView
+        android:id="@+id/note_text"
+        android:text="@string/mock_note_text"
+        android:textSize="@dimen/note_item_text_size"
+        android:padding="@dimen/note_item_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</androidx.cardview.widget.CardView>
