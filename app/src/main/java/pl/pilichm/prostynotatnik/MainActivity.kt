@@ -6,22 +6,24 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import pl.pilichm.prostynotatnik.databinding.ActivityMainBinding
 import pl.pilichm.prostynotatnik.recyclerview.Constants
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.SHARED_PREF_NUM_OF_NOTES
 import pl.pilichm.prostynotatnik.recyclerview.Note
 import pl.pilichm.prostynotatnik.recyclerview.NoteAdapter
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
     private var mNotes: ArrayList<Note>? = ArrayList()
     private var mAdapter: NoteAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         readSavedNotes()
     }
@@ -61,8 +63,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        rvNotes.adapter = mAdapter
-        rvNotes.layoutManager = LinearLayoutManager(this)
+        binding.rvNotes.adapter = mAdapter
+        binding.rvNotes.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

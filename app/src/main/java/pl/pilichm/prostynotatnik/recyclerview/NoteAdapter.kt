@@ -1,7 +1,6 @@
 package pl.pilichm.prostynotatnik.recyclerview
 
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
