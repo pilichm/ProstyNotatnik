@@ -2,6 +2,7 @@ package pl.pilichm.prostynotatnik
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -43,24 +44,24 @@ class MainActivity : AppCompatActivity() {
 
             if (!notesIds.isNullOrEmpty()) {
                 for (noteId in notesIds) {
-                    println("Reading note $noteId")
+                    Log.i("MainActivity", "Reading note $noteId")
                     if (sharedPreferences.contains(noteId)) {
                         val serializedNote = sharedPreferences.getString(noteId,
                             Json.encodeToString(Note("-", "-")))
                         val note = Json.decodeFromString<Note>(serializedNote!!)
                         if (!note.noteText.isNullOrEmpty()) {
-                            println("Read note: ${note.noteText}")
+                            Log.i("MainActivity", "Read note: ${note.noteText}")
                             mNotes!!.add(note)
                         } else {
-                            println("Read note from sp but empty content!")
+                            Log.i("MainActivity", "Read note from sp but empty content!")
                         }
                     } else {
-                        println("No note text for id $noteId!")
+                        Log.i("MainActivity", "No note text for id $noteId!")
                     }
                 }
             }
         } else {
-            println("No notes to display!")
+            Log.i("MainActivity", "No notes to display!")
         }
 
         displaySavedNotes()
