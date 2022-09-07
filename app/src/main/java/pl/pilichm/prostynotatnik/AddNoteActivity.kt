@@ -6,9 +6,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import pl.pilichm.prostynotatnik.databinding.ActivityAddNoteBinding
 import pl.pilichm.prostynotatnik.recyclerview.Constants
+import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_LIST_OF_NOTES_ID
+import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_MAX_NOTE_ID
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_NOTE_TEXT
-import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.SHARED_PREF_NEW_NOTE_SUFFIX
-import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.SHARED_PREF_NOTE_TEXT
 import pl.pilichm.prostynotatnik.recyclerview.Note
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -48,7 +48,29 @@ class AddNoteActivity : AppCompatActivity() {
         val noteText = binding.etAddNote.text.toString()
         val currDate = getCurrentDateAsString()
         val serializedNote = Json.encodeToString(Note(noteText, currDate))
-        editor.putString("${SHARED_PREF_NOTE_TEXT}${SHARED_PREF_NEW_NOTE_SUFFIX}", serializedNote)
+
+        /**
+         * Get value of newest note id. Use zero if no note exists.
+         */
+        val newNoteId = if (sharedPreferences.contains(EXTRA_KEY_MAX_NOTE_ID)){
+            sharedPreferences.getInt(EXTRA_KEY_MAX_NOTE_ID, 0)
+        } else {
+            0
+        }
+
+        /**
+         * Save list of ids for all saved notes.
+         */
+        if (sharedPreferences.contains(EXTRA_KEY_LIST_OF_NOTES_ID)){
+            val listOfNotesIds = sharedPreferences.getString(EXTRA_KEY_LIST_OF_NOTES_ID, "")
+            editor.putString(EXTRA_KEY_LIST_OF_NOTES_ID, "$listOfNotesIds $newNoteId")
+        } else {
+            editor.putString(EXTRA_KEY_LIST_OF_NOTES_ID, "$newNoteId")
+        }
+
+        editor.putString(newNoteId.toString(), serializedNote)
+        editor.putInt(EXTRA_KEY_MAX_NOTE_ID, newNoteId+1)
+
         editor.apply()
     }
 

@@ -6,12 +6,12 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
 import pl.pilichm.prostynotatnik.databinding.ActivityMainBinding
 import pl.pilichm.prostynotatnik.recyclerview.Constants
-import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.SHARED_PREF_NUM_OF_NOTES
+import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_LIST_OF_NOTES_ID
 import pl.pilichm.prostynotatnik.recyclerview.Note
 import pl.pilichm.prostynotatnik.recyclerview.NoteAdapter
 
@@ -28,22 +28,39 @@ class MainActivity : AppCompatActivity() {
         readSavedNotes()
     }
 
+    /**
+     * Function loads all notes from shared preferences.
+     * It is called when activity starts or restarts.
+     */
     private fun readSavedNotes(){
         val sharedPreferences =
             getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
         mNotes = ArrayList()
 
-        if (sharedPreferences.contains(SHARED_PREF_NUM_OF_NOTES)){
-            val notesCount = sharedPreferences.getInt(SHARED_PREF_NUM_OF_NOTES, 0)
-            for (index in 0 until notesCount){
-                val key = "${Constants.SHARED_PREF_NOTE_TEXT}${index}"
-                val serializedNote = sharedPreferences.getString(key,
-                    Json.encodeToString(Note("-", "-")))
-                val note = Json.decodeFromString<Note>(serializedNote!!)
-                if (note.noteText != "-"){
-                    mNotes!!.add(note)
+        if (sharedPreferences.contains(EXTRA_KEY_LIST_OF_NOTES_ID)) {
+            val listOfNotesIds = sharedPreferences.getString(EXTRA_KEY_LIST_OF_NOTES_ID, "") ?: ""
+            val notesIds = listOfNotesIds.split(" ")
+
+            if (!notesIds.isNullOrEmpty()) {
+                for (noteId in notesIds) {
+                    println("Reading note $noteId")
+                    if (sharedPreferences.contains(noteId)) {
+                        val serializedNote = sharedPreferences.getString(noteId,
+                            Json.encodeToString(Note("-", "-")))
+                        val note = Json.decodeFromString<Note>(serializedNote!!)
+                        if (!note.noteText.isNullOrEmpty()) {
+                            println("Read note: ${note.noteText}")
+                            mNotes!!.add(note)
+                        } else {
+                            println("Read note from sp but empty content!")
+                        }
+                    } else {
+                        println("No note text for id $noteId!")
+                    }
                 }
             }
+        } else {
+            println("No notes to display!")
         }
 
         displaySavedNotes()
@@ -90,21 +107,6 @@ class MainActivity : AppCompatActivity() {
      * */
     override fun onRestart() {
         super.onRestart()
-        val sharedPreferences =
-            getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
-
-        val key = "${Constants.SHARED_PREF_NOTE_TEXT}${Constants.SHARED_PREF_NEW_NOTE_SUFFIX}"
-        if (sharedPreferences.contains(key)){
-            val newNote = sharedPreferences.getString(key, Json.encodeToString(Note("-", "-")))
-            val editor = sharedPreferences.edit()
-            val notesCount = mNotes!!.size + 1
-            editor.putInt(SHARED_PREF_NUM_OF_NOTES, notesCount)
-            val newKey = "${Constants.SHARED_PREF_NOTE_TEXT}${notesCount}"
-            editor.putString(newKey, newNote)
-            editor.remove(key)
-            editor.apply()
-        }
-
         readSavedNotes()
     }
 }
