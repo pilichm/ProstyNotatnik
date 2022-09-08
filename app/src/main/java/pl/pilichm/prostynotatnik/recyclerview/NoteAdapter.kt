@@ -10,13 +10,22 @@ import pl.pilichm.prostynotatnik.R
 class NoteAdapter(private val notes: ArrayList<Note>):
     RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
     private var onClickListener: OnClickListener? = null
+    private var onLongClickListener: OnLongClickListener? = null
 
     interface OnClickListener {
         fun onClick(position: Int, item: Note)
     }
 
+    interface OnLongClickListener {
+        fun onLongClick(position: Int, item: Note)
+    }
+
     fun addOnClickListener(onClickListener: OnClickListener){
         this.onClickListener = onClickListener
+    }
+
+    fun addOnLongClickListener(onLongClickListener: OnLongClickListener){
+        this.onLongClickListener = onLongClickListener
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -43,6 +52,13 @@ class NoteAdapter(private val notes: ArrayList<Note>):
             if (onClickListener!=null){
                 onClickListener!!.onClick(position, note)
             }
+        }
+
+        holder.itemView.setOnLongClickListener {
+            if (onLongClickListener!=null){
+                onLongClickListener!!.onLongClick(position, note)
+            }
+            true
         }
     }
 
