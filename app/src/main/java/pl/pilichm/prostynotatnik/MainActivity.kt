@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import pl.pilichm.prostynotatnik.databinding.ActivityMainBinding
 import pl.pilichm.prostynotatnik.recyclerview.Constants
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_LIST_OF_NOTES_ID
+import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_NOTE_ID
 import pl.pilichm.prostynotatnik.recyclerview.Note
 import pl.pilichm.prostynotatnik.recyclerview.NoteAdapter
 
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                         val serializedNote = sharedPreferences.getString(noteId,
                             Json.encodeToString(Note("-", "-")))
                         val note = Json.decodeFromString<Note>(serializedNote!!)
-                        if (!note.noteText.isNullOrEmpty()) {
+                        if (note.noteText.isNotEmpty()) {
                             Log.i("MainActivity", "Read note: ${note.noteText}")
                             mNotes!!.add(note)
                         } else {
@@ -77,12 +78,41 @@ class MainActivity : AppCompatActivity() {
             override fun onClick(position: Int, item: Note) {
                 val intent = Intent(applicationContext, AddNoteActivity::class.java)
                 intent.putExtra(Constants.EXTRA_KEY_NOTE_TEXT, mNotes!![position].noteText)
+                intent.putExtra(EXTRA_KEY_NOTE_ID, getNoteIdByText(mNotes!![position].noteText))
                 startActivity(intent)
             }
         })
 
         binding.rvNotes.adapter = mAdapter
         binding.rvNotes.layoutManager = LinearLayoutManager(this)
+    }
+
+    /**
+     * Function for retrieving note id by its text.
+     */
+    private fun getNoteIdByText(noteText: String): String {
+        val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
+
+        if (sharedPreferences.contains(EXTRA_KEY_LIST_OF_NOTES_ID)) {
+            val listOfNotesIds = sharedPreferences.getString(EXTRA_KEY_LIST_OF_NOTES_ID, "") ?: ""
+            val notesIds = listOfNotesIds.split(" ")
+
+            if (!notesIds.isNullOrEmpty()) {
+                for (noteId in notesIds){
+                    if (sharedPreferences.contains(noteId)){
+                        val serializedNote = sharedPreferences.getString(noteId,
+                        Json.encodeToString(Note("-", "-")))
+                        val note = Json.decodeFromString<Note>(serializedNote!!)
+
+                        if (note.noteText.isNotEmpty()&&note.noteText.equals(noteText)) {
+                            return noteId
+                        }
+                    }
+                }
+            }
+        }
+
+        return ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
