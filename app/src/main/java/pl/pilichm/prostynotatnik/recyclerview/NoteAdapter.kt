@@ -1,8 +1,11 @@
 package pl.pilichm.prostynotatnik.recyclerview
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import pl.pilichm.prostynotatnik.R
@@ -17,7 +20,7 @@ class NoteAdapter(private val notes: ArrayList<Note>):
     }
 
     interface OnLongClickListener {
-        fun onLongClick(position: Int, item: Note)
+        fun onLongClick(position: Int, item: Note, action: () -> Unit)
     }
 
     fun addOnClickListener(onClickListener: OnClickListener){
@@ -54,9 +57,16 @@ class NoteAdapter(private val notes: ArrayList<Note>):
             }
         }
 
+        /**
+         * On long click pressed items background color changes to gray.
+         */
         holder.itemView.setOnLongClickListener {
             if (onLongClickListener!=null){
-                onLongClickListener!!.onLongClick(position, note)
+                val llNote = holder.itemView.findViewById(R.id.llNote) as LinearLayout
+                llNote.background = ColorDrawable(Color.parseColor("#D3D3D3"))
+                onLongClickListener!!.onLongClick(position, note) {
+                    llNote.background = ColorDrawable(Color.parseColor("#FFFFFF"))
+                }
             }
             true
         }

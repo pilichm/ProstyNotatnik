@@ -89,8 +89,8 @@ class MainActivity : AppCompatActivity() {
          * Ask if note should be deleted on long click.
          */
         mAdapter!!.addOnLongClickListener(object: NoteAdapter.OnLongClickListener{
-            override fun onLongClick(position: Int, item: Note) {
-                displayDeleteDialog(position)
+            override fun onLongClick(position: Int, item: Note, action: () -> Unit) {
+                displayDeleteDialog(position, action)
             }
         })
 
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Function for displaying dialog asking user if pressed note should be deleted.
      */
-    private fun displayDeleteDialog(position: Int){
+    private fun displayDeleteDialog(position: Int, endAction: () -> Unit){
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Delete note?")
         builder.setMessage("Should pressed note be deleted?")
@@ -111,11 +111,13 @@ class MainActivity : AppCompatActivity() {
         ) { dialog, _ ->
             deleteNoteByText(position)
             dialog.cancel()
+            endAction()
         }
 
         builder.setNegativeButton("Cancel"
         ) { dialog, _ ->
             dialog.cancel()
+            endAction()
         }
 
         builder.create().show()
