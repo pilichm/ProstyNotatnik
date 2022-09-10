@@ -5,15 +5,13 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import pl.pilichm.prostynotatnik.Util.Companion.getCurrentDateAsString
+import pl.pilichm.prostynotatnik.Util.Companion.saveNote
 import pl.pilichm.prostynotatnik.databinding.ActivityAddNoteBinding
 import pl.pilichm.prostynotatnik.recyclerview.Constants
-import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_LIST_OF_NOTES_ID
-import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_MAX_NOTE_ID
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_NOTE_ID
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_NOTE_TEXT
 import pl.pilichm.prostynotatnik.recyclerview.Note
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class AddNoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddNoteBinding
@@ -42,55 +40,14 @@ class AddNoteActivity : AppCompatActivity() {
             if (passedNoteId!=""){
                 updateNote()
             } else {
-                saveNote()
+                val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
+                val noteText = binding.etAddNote.text.toString()
+                val currDate = getCurrentDateAsString()
+
+                saveNote(sharedPreferences, noteText, currDate)
             }
             finish()
         }
-    }
-
-    /**
-     * Function for saving created note.
-     * */
-    private fun saveNote(){
-        val sharedPreferences =
-            getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val noteText = binding.etAddNote.text.toString()
-        val currDate = getCurrentDateAsString()
-        val serializedNote = Json.encodeToString(Note(noteText, currDate))
-
-        /**
-         * Get value of newest note id. Use zero if no note exists.
-         */
-        val newNoteId = if (sharedPreferences.contains(EXTRA_KEY_MAX_NOTE_ID)){
-            sharedPreferences.getInt(EXTRA_KEY_MAX_NOTE_ID, 0)
-        } else {
-            0
-        }
-
-        /**
-         * Save list of ids for all saved notes.
-         */
-        if (sharedPreferences.contains(EXTRA_KEY_LIST_OF_NOTES_ID)){
-            val listOfNotesIds = sharedPreferences.getString(EXTRA_KEY_LIST_OF_NOTES_ID, "")
-            editor.putString(EXTRA_KEY_LIST_OF_NOTES_ID, "$listOfNotesIds $newNoteId")
-        } else {
-            editor.putString(EXTRA_KEY_LIST_OF_NOTES_ID, "$newNoteId")
-        }
-
-        editor.putString(newNoteId.toString(), serializedNote)
-        editor.putInt(EXTRA_KEY_MAX_NOTE_ID, newNoteId+1)
-
-        editor.apply()
-    }
-
-    /**
-     * Get current date as string.
-     * */
-    private fun getCurrentDateAsString(): String {
-        val current = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        return  current.format(formatter)
     }
 
     /**
@@ -120,7 +77,11 @@ class AddNoteActivity : AppCompatActivity() {
 
         builder.setPositiveButton("Save"
         ) { dialog, _ ->
-            saveNote()
+            val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
+            val noteText = binding.etAddNote.text.toString()
+            val currDate = getCurrentDateAsString()
+
+            saveNote(sharedPreferences, noteText, currDate)
             dialog.cancel()
             finish()
         }

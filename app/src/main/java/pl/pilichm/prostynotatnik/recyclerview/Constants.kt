@@ -7,5 +7,6 @@ class Constants {
         const val EXTRA_KEY_LIST_OF_NOTES_ID = "listOfNotesIds"
         const val EXTRA_KEY_MAX_NOTE_ID = "maxNoteId"
         const val EXTRA_KEY_NOTE_ID = "note_id"
+        const val EXTRA_KEY_LAST_DELETED_NOTE = "last_deleted_note"
     }
 }

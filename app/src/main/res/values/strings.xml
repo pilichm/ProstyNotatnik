@@ -5,4 +5,5 @@
     <string name="mock_note_text">Mock note that wont be seen...</string>
     <string name="add_note_text">Add note...</string>
     <string name="mock_note_creation_time">00/00/0000</string>
+    <string name="undo_delete_last_note">Undo delete last note.</string>
 </resources>

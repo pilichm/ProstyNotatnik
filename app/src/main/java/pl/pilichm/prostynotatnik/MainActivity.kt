@@ -6,13 +6,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import pl.pilichm.prostynotatnik.Util.Companion.getCurrentDateAsString
 import pl.pilichm.prostynotatnik.databinding.ActivityMainBinding
 import pl.pilichm.prostynotatnik.recyclerview.Constants
+import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_LAST_DELETED_NOTE
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_LIST_OF_NOTES_ID
 import pl.pilichm.prostynotatnik.recyclerview.Constants.Companion.EXTRA_KEY_NOTE_ID
 import pl.pilichm.prostynotatnik.recyclerview.Note
@@ -67,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         displaySavedNotes()
+        displayRestoreNoteFab()
     }
 
     /**
@@ -156,6 +160,7 @@ class MainActivity : AppCompatActivity() {
                             matchedNoteId = noteId
                             val editor = sharedPreferences.edit()
                             editor.remove(noteId)
+                            editor.putString(EXTRA_KEY_LAST_DELETED_NOTE, note.noteText)
                             editor.apply()
                         }
                     }
@@ -224,6 +229,53 @@ class MainActivity : AppCompatActivity() {
             }
             else -> {
                 super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
+    /**
+     * Function displays floating action button allowing user to restore last deleted note.
+     * If no note was deleted during curring app runtime fab isn't displayed.
+     */
+    private fun displayRestoreNoteFab(){
+        val sharedPreferences = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
+
+        binding.fabRestoreNote.visibility = if (sharedPreferences.contains(EXTRA_KEY_LAST_DELETED_NOTE)) {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
+        }
+
+        binding.fabRestoreNote.setOnClickListener {
+            if (sharedPreferences.contains(EXTRA_KEY_LAST_DELETED_NOTE)){
+                val noteText = sharedPreferences.getString(EXTRA_KEY_LAST_DELETED_NOTE, "")
+                if (noteText!=""){
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("Restore note?")
+                    builder.setMessage("Should last deleted note be restored?")
+                    builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+                    builder.setPositiveButton("Restore"
+                    ) { dialog, _ ->
+                        val currDate = getCurrentDateAsString()
+
+                        Util.saveNote(sharedPreferences, noteText ?: "", currDate)
+
+                        val editor = sharedPreferences.edit()
+                        editor.remove(EXTRA_KEY_LAST_DELETED_NOTE)
+                        editor.apply()
+
+                        readSavedNotes()
+                        dialog.cancel()
+                    }
+
+                    builder.setNegativeButton("Cancel"
+                    ) { dialog, _ ->
+                        dialog.cancel()
+                    }
+
+                    builder.create().show()
+                }
             }
         }
     }
